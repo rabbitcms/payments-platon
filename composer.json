@@ -1,0 +1,14 @@
+{
+    "name": "rabbitcms/payments-platon",
+    "description": "Platon payments provider.",
+    "require": {
+        "rabbitcms/payments": "^1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Kulyk",
+            "email": "lnkvisitor.ts@gmail.com"
+        }
+    ]
+}
