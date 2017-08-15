@@ -83,7 +83,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
 
         $data['order'] = $transaction->getTransactionId();
 
-        return (new Action($this, Action::ACTION_OPEN, $data))
+        return (new Action($this, Action::ACTION_OPEN, $this->sign($data)))
             ->setUrl(self::PUBLIC_URL)
             ->setMethod(Action::METHOD_POST);
     }
