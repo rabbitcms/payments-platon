@@ -45,11 +45,16 @@ class PlatonPaymentProvider implements PaymentProviderInterface
     /**
      * @param OrderInterface $order
      *
+     * @param callable|null  $callback
+     *
      * @return ContinuableInterface
      */
-    public function createPayment(OrderInterface $order): ContinuableInterface
+    public function createPayment(OrderInterface $order, callable $callback = null): ContinuableInterface
     {
         $payment = $order->getPayment();
+        if ($callback) {
+            call_user_func($callback, $payment, $this);
+        }
         $client = $payment->getClient();
         $amount = round($payment->getAmount(), 2);
         $data = [
