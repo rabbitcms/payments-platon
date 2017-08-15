@@ -10,5 +10,15 @@
             "name": "Dmytro Kulyk",
             "email": "lnkvisitor.ts@gmail.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "RabbitCMS\\Payments\\Platon\\": "src/"
+        }
+    },
+    "extra": {
+        "module": {
+            "providers": "RabbitCMS\\Payments\\Platon\\ModuleProvider"
+        }
+    }
 }
