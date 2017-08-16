@@ -92,7 +92,14 @@ class PlatonPaymentProvider implements PaymentProviderInterface
      */
     public function callback(ServerRequestInterface $request): ResponseInterface
     {
-        $this->logger->info('callback', (array)$request->getBody()->getContents());
+        $this->logger->debug('callback', [
+            'ip' => $request->getServerParams()['REMOTE_ADDR'],
+            'uri'=>$request->getUri(),
+            'query'=>$request->getQueryParams(),
+            'cookies'=>$request->getCookieParams(),
+            'headers'=>$request->getHeaders(),
+            'body'=>$request->getBody()->getContents()
+        ]);
         $data = $request->getParsedBody();
 
 
