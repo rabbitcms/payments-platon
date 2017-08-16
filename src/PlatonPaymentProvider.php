@@ -100,6 +100,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
      */
     public function callback(ServerRequestInterface $request): ResponseInterface
     {
+        $this->logger->info('callback', $request->getBody()->getContents());
         $data = $request->getParsedBody();
 
 
