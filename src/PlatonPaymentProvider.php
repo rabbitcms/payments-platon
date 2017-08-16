@@ -62,7 +62,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
             'url' => $payment->getReturnUrl(),
             'lang' => $payment->getLanguage(),
             'data' => [
-                'amount' => $amount,
+                'amount' => number_format($amount, 2, '.', ''),
                 'currency' => $payment->getCurrency(),
                 'description' => Str::limit($payment->getDescription(), 255, '')
             ],
