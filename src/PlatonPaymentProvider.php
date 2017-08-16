@@ -12,6 +12,7 @@ use RabbitCMS\Payments\Concerns\PaymentProvider;
 use RabbitCMS\Payments\Contracts\ContinuableInterface;
 use RabbitCMS\Payments\Contracts\OrderInterface;
 use RabbitCMS\Payments\Contracts\PaymentProviderInterface;
+use RabbitCMS\Payments\Entities\CardToken;
 use RabbitCMS\Payments\Entities\Transaction;
 use RabbitCMS\Payments\Support\Action;
 use RabbitCMS\Payments\Support\Invoice;
@@ -72,7 +73,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
             'phone' => $client->getPhone(),
         ];
 
-        $transaction = $this->makeTransaction($order,$payment);
+        $transaction = $this->makeTransaction($order, $payment);
 
         $data['order'] = $transaction->getTransactionId();
 
@@ -94,11 +95,11 @@ class PlatonPaymentProvider implements PaymentProviderInterface
     {
         $this->logger->debug('callback', [
             'ip' => $request->getServerParams()['REMOTE_ADDR'],
-            'uri'=>$request->getUri(),
-            'query'=>$request->getQueryParams(),
-            'cookies'=>$request->getCookieParams(),
-            'headers'=>$request->getHeaders(),
-            'body'=>$request->getBody()->getContents()
+            'uri' => $request->getUri(),
+            'query' => $request->getQueryParams(),
+            'cookies' => $request->getCookieParams(),
+            'headers' => $request->getHeaders(),
+            'body' => $request->getBody()->getContents()
         ]);
         $data = $request->getParsedBody();
 
@@ -108,14 +109,25 @@ class PlatonPaymentProvider implements PaymentProviderInterface
         }
 
         if (array_key_exists($data['status'], self::$statuses)) {
-            $this->manager->process(new Invoice(
+            $invoice = new Invoice(
                 $this,
                 (string)$data['id'],
                 (string)$data['order'],
                 Transaction::TYPE_PAYMENT,
                 (int)self::$statuses[$data['status']],
                 (float)$data['amount']
-            ));
+            );
+
+            if (array_key_exists('rc_token', $data)) {
+                $invoice->setCard(new CardToken([
+                    'card' => $data['card'],
+                    'token' => $data['rc_token'],
+                    'data' => [
+                        'rc_id' => $data['rc_id']
+                    ]
+                ]));
+            }
+            $this->manager->process($invoice);
         }
         return new Response();
     }
