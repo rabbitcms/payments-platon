@@ -72,21 +72,13 @@ class PlatonPaymentProvider implements PaymentProviderInterface
             'phone' => $client->getPhone(),
         ];
 
-        $transaction = new Transaction([
-            'type' => Transaction::TYPE_PAYMENT,
-            'status' => Transaction::STATUS_PENDING,
-            'amount' => $amount
-        ]);
+        $transaction = $this->makeTransaction($order,$payment);
+
+        $data['order'] = $transaction->getTransactionId();
 
         if ($payment->getCardId() === 0) {
             $data['data'][] = 'recurring';
         }
-
-        $transaction->order()->associate($order);
-
-        $transaction->save();
-
-        $data['order'] = $transaction->getTransactionId();
 
         return (new Action($this, Action::ACTION_OPEN, $this->sign($data)))
             ->setUrl(self::PUBLIC_URL)
