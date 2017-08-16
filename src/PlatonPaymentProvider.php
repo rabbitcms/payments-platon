@@ -142,7 +142,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
      */
     public function sign(array $data): array
     {
-        $data['data'] = base64_encode(json_encode($data['data']));
+        $data['data'] = base64_encode(json_encode($data['data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         $data['sign'] = md5(strtoupper(
             strrev($data['key'] = $this->config('merchant')) .
             strrev($data['payment']) .
