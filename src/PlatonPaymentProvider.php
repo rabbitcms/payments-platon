@@ -164,4 +164,12 @@ class PlatonPaymentProvider implements PaymentProviderInterface
         ));
         return $data;
     }
+
+    /**
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return !empty($this->config('merchant')) && !empty($this->config('password'));
+    }
 }
