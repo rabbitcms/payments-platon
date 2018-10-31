@@ -46,11 +46,12 @@ class PlatonPaymentProvider implements PaymentProviderInterface
     /**
      * @param OrderInterface $order
      *
-     * @param callable|null  $callback
+     * @param callable|null $callback
      *
+     * @param array $options
      * @return ContinuableInterface
      */
-    public function createPayment(OrderInterface $order, callable $callback = null): ContinuableInterface
+    public function createPayment(OrderInterface $order, callable $callback = null, array $options = []): ContinuableInterface
     {
         $payment = $order->getPayment();
         if ($callback) {
@@ -73,7 +74,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
             'phone' => $client->getPhone(),
         ];
 
-        $transaction = $this->makeTransaction($order, $payment);
+        $transaction = $this->makeTransaction($order, $payment, $options);
 
         $data['order'] = $transaction->getTransactionId();
 
@@ -105,7 +106,7 @@ class PlatonPaymentProvider implements PaymentProviderInterface
 
 
         if ($this->sign2($data) !== $data['sign']) {
-            throw new RuntimeException('Invalid signature');
+            throw new \RuntimeException('Invalid signature');
         }
 
         if (array_key_exists($data['status'], self::$statuses)) {
