@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace RabbitCMS\Payments\Platon;
 
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -16,6 +17,7 @@ use RabbitCMS\Payments\Entities\CardToken;
 use RabbitCMS\Payments\Entities\Transaction;
 use RabbitCMS\Payments\Support\Action;
 use RabbitCMS\Payments\Support\Invoice;
+use Zend\Diactoros\Response;
 
 /**
  * Class PlatonPaymentProvider
@@ -51,8 +53,11 @@ class PlatonPaymentProvider implements PaymentProviderInterface
      * @param array $options
      * @return ContinuableInterface
      */
-    public function createPayment(OrderInterface $order, callable $callback = null, array $options = []): ContinuableInterface
-    {
+    public function createPayment(
+        OrderInterface $order,
+        callable $callback = null,
+        array $options = []
+    ): ContinuableInterface {
         $payment = $order->getPayment();
         if ($callback) {
             call_user_func($callback, $payment, $this);
@@ -104,9 +109,27 @@ class PlatonPaymentProvider implements PaymentProviderInterface
         ]);
         $data = $request->getParsedBody();
 
+        try {
+            Validator::validate($data, [
+                'sign' => ['required'],
+                'status' => ['required'],
+                'id' => ['required'],
+                'order' => ['required'],
+                'amount' => ['required'],
+            ]);
+        } catch (ValidationException $exception) {
+            return new Response\JsonResponse([
+                'message' => $exception->getMessage(),
+                'errors' => $exception->errors(),
+            ], $exception->status, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
 
         if ($this->sign2($data) !== $data['sign']) {
-            throw new \RuntimeException('Invalid signature');
+            return new Response\JsonResponse(['message' => 'Invalid signature'], 403, [
+                'Content-Type' => 'application/json'
+            ]);
         }
 
         if (array_key_exists($data['status'], self::$statuses)) {
