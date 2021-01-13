@@ -1,9 +1,6 @@
 {
     "name": "rabbitcms/payments-platon",
     "description": "Platon payments provider.",
-    "require": {
-        "rabbitcms/payments": "^1.0"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -11,6 +8,13 @@
             "email": "lnkvisitor.ts@gmail.com"
         }
     ],
+    "require": {
+        "nyholm/psr7": "^1.2",
+        "rabbitcms/payments": "^1.0"
+    },
+    "provide": {
+        "rabbicms/payments-provider": "1.0"
+    },
     "autoload": {
         "psr-4": {
             "RabbitCMS\\Payments\\Platon\\": "src/"
