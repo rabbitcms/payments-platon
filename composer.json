@@ -13,7 +13,7 @@
         "rabbitcms/payments": "^1.0"
     },
     "provide": {
-        "rabbicms/payments-provider": "1.0"
+        "rabbitcms/payments-provider": "1.0"
     },
     "autoload": {
         "psr-4": {
